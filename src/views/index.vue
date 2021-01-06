@@ -13,6 +13,6 @@ import AuthorPost from "../components/authorPost.vue"
   }
 })
 export default class index extends Vue{
-  private name :string = "ubdedaw"
+  private name :string = "ubdedawweq"
 }
 </script>
