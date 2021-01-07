@@ -1,24 +1,6 @@
 # vue-blog
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 2021/01/07 by Lasia
+- 完成首页基本样式
+- 完成悬浮功能球的回到顶部功能
+- 正在构建搜索功能视图

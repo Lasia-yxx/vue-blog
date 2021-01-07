@@ -17,9 +17,7 @@ export default class AuthorPost extends Vue{
   private style: string = ''
   private mounted(): void {
     let i :number = Number((Math.random()*gradientColor.length).toFixed())
-    this.style = gradientColor[i]
-    // console.log();
-    
+    this.style = gradientColor[i]    
   }
 }
 </script>
@@ -29,7 +27,7 @@ export default class AuthorPost extends Vue{
 #ls-AP-app{
   width: 100%;
   height: 50vh;
-  // background: linear-gradient(to right, #36d1dc, #5b86e5);
+  background: linear-gradient(to right, #ffafbd, #ffc3a0);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,7 +45,6 @@ export default class AuthorPost extends Vue{
   }
   .ls-AP-nickName{
     font-size: 1.8rem;
-
   }
 }
 .ls-AP-user-info-warp > img{
@@ -55,12 +52,16 @@ export default class AuthorPost extends Vue{
   height: 100px;
   object-fit: cover;
   border-radius: 100%;
-  
+  box-shadow:  0 2px 12px 0 rgba(51, 51, 51, .4)
 }
 
 @media screen and (max-width: 800px){
   #ls-AP-app{
-    height: 45vh;
+    height: 40vh;
+  }
+  .ls-AP-user-info-warp > img{
+    width: 80px;
+    height: 80px;
   }
 }
 

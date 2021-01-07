@@ -11,5 +11,4 @@ export let gradientColor :Array<string> = [
   "background: linear-gradient(to right, #eecda3, #ef629f);",
   "background: linear-gradient(to right, #fd746c, #ff9068);",
   "background: linear-gradient(to right, #00c9ff, #92fe9d);",
-  "background: linear-gradient(to right, #fc00ff, #00dbde);"
 ]
