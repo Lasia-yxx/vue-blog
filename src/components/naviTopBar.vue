@@ -1,8 +1,8 @@
 <template>
   <div id="ls-navi-warp">
     <div v-for="item in naviLink" :key="item.index" class="ls-navi-title-warp" >
-      <i :class="[item.iconClass,'ls-navi-icon',item.choose?'ls-navi-choose':'']"></i>
-      <a @click="chooseNavi(item.id)" :class="item.choose?'ls-navi-choose':''">{{item.name}}</a>
+      <i @click="chooseNavi(item.id)" :class="[item.iconClass,'ls-navi-icon',$route.name==item.url?'ls-navi-choose':'']"></i>
+      <a @click="chooseNavi(item.id)" :class="$route.name==item.url?'ls-navi-choose':''">{{item.name}}</a>
     </div>
   </div>
 </template>
@@ -12,25 +12,28 @@ import { Component, Vue } from "vue-property-decorator";
 interface naviObject {
   id:number,
   name:string,
-  choose:boolean,
-  iconClass:string
+  iconClass:string,
+  url:string
 }
 
 @Component
 export default class NaviTopBar extends Vue{
+
+  $route;$router
+
   private naviLink: Array<naviObject> = [
-      {id:0,name:"BLOG",choose:true,iconClass:"el-icon-menu"},
-      {id:1,name:"NOTES",choose:false,iconClass:"el-icon-s-management"},
-      {id:2,name:"PHOTO",choose:false,iconClass:"el-icon-camera-solid"},
-      {id:3,name:"ABOUT",choose:false,iconClass:"el-icon-user-solid"},
+      {id:0,name:"BLOG",iconClass:"el-icon-menu",url:"index"},
+      {id:1,name:"NOTES",iconClass:"el-icon-s-management",url:"notes"},
+      {id:2,name:"PHOTO",iconClass:"el-icon-camera-solid",url:"photo"},
+      {id:3,name:"ABOUT",iconClass:"el-icon-user-solid",url:"about"},
     ];
   private chooseIndex: number = 0
-  private chooseNavi(id:number): boolean{    
-    if(id == this.chooseIndex){return false}
-    this.naviLink[id].choose = true
-    this.naviLink[this.chooseIndex].choose = false
-    this.chooseIndex = id
-    return true
+  private vue = Vue.prototype
+
+  private chooseNavi(id:number): void{
+    if(this.naviLink[id].url != this.$route.name){
+      this.$router.push({path:this.naviLink[id].url})
+    }
   }
 }
 </script>
@@ -79,7 +82,7 @@ export default class NaviTopBar extends Vue{
       height: 80px;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       color: rgb(99, 99, 99);
-      -webkit-tap-highlight-color:rgba(0,0,0,0);
+      // -webkit-tap-highlight-color:rgba(0,0,0,0);
       display: flex;
       font-size: 1.6rem;
     }
@@ -94,7 +97,6 @@ export default class NaviTopBar extends Vue{
     .ls-navi-icon{
       display: block;
       margin-bottom: 10px;
-      // font-size: 2.2rem;
     }
   }
 

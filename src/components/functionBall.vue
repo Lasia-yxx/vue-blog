@@ -4,29 +4,53 @@
       <i class="el-icon-ice-cream-round"></i>
     </div>
     <div class="ls-FB-funcWarp" :style="style" >
-      <div class="ls-FB-func">Dark Mode</div>
-      <div class="ls-FB-func" @click="search">Search</div>
-      <div class="ls-FB-func" @click="backTop">Back Top</div>
+
+      <div :class="['ls-FB-func',this.$darkMode?'choose':'']" @click="darkMode">Dark Mode</div>
+      <div :class="['ls-FB-func',$route.name=='search'?'choose':'']" @click="search">Search</div>
+      <div :class="['ls-FB-func',$loginStatus?'choose':'']" @click="login">Login</div>
       
     </div>
   </div>
 </template>
 <script lang="ts">
-import {Component,Vue} from 'vue-property-decorator'
+import {Component,Vue,Emit,Prop,Watch} from 'vue-property-decorator'
 
+interface styleObj{
+  maxHeight:String,
+  opacity: Number
+}
 
 @Component
 export default class FunctionBall extends Vue{
+
+  $router;$darkMode;$route;$loginStatus
+
   private display: boolean = false
-  private style: string = "max-height:0px"
+  private style: styleObj = {maxHeight:'0px',opacity:0}
+
   private showFunction(): void{
-    if(this.display){this.style = "max-height:0px"}else{this.style = "max-height:200px"}
+    if(this.display){this.style = {maxHeight:"0px",opacity:0}}else{this.style = {maxHeight:"200px",opacity:1}}
     this.display = !this.display
   }
-  private backTop(): void{scrollTo(0,0)}
   private search(): void{
-    
+    if(this.$route.name != "search"){
+      this.$router.push({path:"search"})
+    }
+    this.showFunction()
   }
+
+  @Emit("darkMode")
+  private darkMode(): boolean{ //告知全部组件，是否开启dark mode
+    this.$darkMode = !this.$darkMode
+    this.showFunction()
+    return this.$darkMode
+  }
+  @Emit("login")
+  private login(): boolean{
+    this.showFunction()
+    return true
+  }
+
 }
 </script>
 
@@ -65,7 +89,10 @@ export default class FunctionBall extends Vue{
     margin-left: 30px;
     border-left: 3px solid #ffa8a8;
     margin-bottom: 10px;
-    transition: max-height .8s ease-in-out;
+    transition-property: max-height,opacity; 
+    transition-duration:.8s , 1.2s;
+    transition-timing-function:ease;
+    // transition: opacity .8s ease-in-out;
     overflow: hidden;
     padding-right: 15px;
   }
@@ -83,5 +110,40 @@ export default class FunctionBall extends Vue{
   .ls-FB-func:hover{
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .15);
     color: #ffa8a8;
+  }
+
+  .choose{
+    color: #08bbff;
+  }
+
+  @media screen and (max-width: 800px) {
+    #ls-FB-warp{
+      bottom: initial;
+      top: 20px;
+      left: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .ls-FB-ball{
+      width: 50px;
+      height: 50px;
+    }
+    .ls-FB-ball:hover{
+      box-shadow: 0 2px 12px 0 rgba(102, 67, 67, 0.2);
+      color: #ffa8a8;
+    }
+    .ls-FB-funcWarp{
+      margin-left: 22px;
+      margin-top: 10px;
+    }
+    .ls-FB-func{
+      width: 110px;
+      height: 40px;
+      line-height: 40px;
+    }
+    .ls-FB-func:hover{
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      color: inherit;
+    }
   }
 </style>

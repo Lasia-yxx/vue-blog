@@ -1,42 +1,62 @@
 <template>
-  <div id="ls-BDL-warp">
-    <div v-for="item in blogData" :key="item.index" class="ls-BDL-container">
+  <div id="ls-BDL-warp" :style="dark_mode_style">
+    <div v-for="item in cleanData" :key="item.index" class="ls-BDL-container">
       <div class="ls-BDL-title">{{item.blog_title}}</div>
-      <div class="ls-BDL-describle">{{item.blog_describle}}<a class="ls-BDL-arrow">>></a></div>
-      <div class="ls-BDL-date">{{item.blog_date}}</div>
-      <div class="ls-BDL-type"><i class="el-icon-link"></i>{{item.blog_type}}</div>
+      <div class="ls-BDL-describle" :style="dark_mode_style">{{item.blog_describle}}<a class="ls-BDL-arrow">>></a></div>
+      <div class="ls-BDL-date" :style="dark_mode_style">{{item.blog_date}}</div>
+      <div class="ls-BDL-type" :style="dark_mode_style"><i class="el-icon-link"></i>{{item.blog_type}}</div>
+      <div v-if="isHoster" :style="dark_mode_style" class="ls-del-btn">删除</div>
+      <div v-if="isHoster" :style="dark_mode_style" class="ls-edit-btn">编辑</div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Watch,Prop, Vue, } from "vue-property-decorator";
+import tool from "../ulits/tools"
 
 interface blogObject{
   blog_title:string,
   blog_describle:string,
   blog_date:string,
-  blog_type:string
+  blog_type:string,
+  id:Number
+}
+interface styleDM{
+  color:string,
+  backgroundColor:string
 }
 
 @Component
 export default class BlogDataList extends Vue{
-  private blogData: Array<blogObject> = [
-    {blog_title:"JavaScript基础算法：反转字符串",blog_describle:"mac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧ac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧",blog_date:"28 OCT 2016",blog_type:"工具"},
-    {blog_title:"JavaScript基础算法：反转字符串",blog_describle:"mac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧",blog_date:"28 OCT 2016",blog_type:"工具"},
-    {blog_title:"JavaScript基础算法：反转字符串",blog_describle:"mac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧",blog_date:"28 OCT 2016",blog_type:"工具"}
-  ]
+
+  @Prop({type:Boolean,default:false}) isHoster!: boolean
+  @Prop({type:Array,required:true}) blogData!: Array<blogObject>
+  get cleanData(){
+    tool.$dateFormat(this.blogData)
+    return this.blogData
+  }
+
+  @Prop({type:Boolean,required:true}) darkMode!: boolean
+  @Watch("darkMode",{immediate:true,deep:true})
+  onDarkModeChange(oldVal:boolean,newVal:boolean): void{
+    if(oldVal){
+      this.dark_mode_style = {color:"#e4e4e4",backgroundColor:""}
+    }else{
+      this.dark_mode_style = null
+    }
+  }
+
+  private dark_mode_style: styleDM = null
 }
 </script>
 <style lang="scss" scoped>
   #ls-BDL-warp{
     width: 100%;
-    // min-width: 800px;
     color: rgb(99, 99, 99);
     font-size: 1rem;
   }
 
   .ls-BDL-container{
-    // background-color: white;
     margin: 20px 0;
     padding: 20px 0;
     letter-spacing: 1px;
@@ -44,6 +64,9 @@ export default class BlogDataList extends Vue{
       font-size: 2.5em;
       font-weight: bold;
       cursor: pointer;
+    }
+    .ls-BDL-title:hover{
+      color: #409EFF;
     }
     .ls-BDL-date,.ls-BDL-type{
       display: inline-block;
@@ -74,10 +97,20 @@ export default class BlogDataList extends Vue{
     }
   }
 
+  .ls-del-btn,.ls-edit-btn{
+    display: inline-block;
+    font-size: 1.5em;
+    color: rgba(99, 99, 99, .65);
+    cursor: pointer;
+    margin-left: 30px;
+    user-select: none;
+  }
+  .ls-del-btn:hover,.ls-edit-btn:hover{
+    color: #409EFF;
+  }
+
   @media screen and (max-width: 800px) {
      #ls-BDL-warp{
-      //  width: 90%;
-      //  min-width: initial;
        font-size: 0.8rem;
      }
      .ls-BDL-container{
@@ -87,11 +120,11 @@ export default class BlogDataList extends Vue{
      .ls-BDL-container > .ls-BDL-describle{
         margin-top: 10px;
         line-height: 20px;
+        font-weight: bold;
         .ls-BDL-arrow{
           margin-left: 10px;
           line-height: 20px;
           font-size: 1em;
-
         }
       }
   }

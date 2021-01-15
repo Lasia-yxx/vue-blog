@@ -1,7 +1,7 @@
 <template>
   <div id="ls-AP-app" :style="style">
     <div class="ls-AP-user-info-warp">
-      <img src="http://www.yxxlasia.fun:3000/static/images/avatar/avatar.jpg" >
+      <img @click="about" src="http://www.yxxlasia.fun:3000/static/images/avatar/avatar.jpg" >
       <p class="ls-AP-motto">Life Is Strange</p>
       <p class="ls-AP-nickName">花落柳下</p>
     </div>
@@ -9,16 +9,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component,Emit,Vue } from "vue-property-decorator";
 import {gradientColor} from "../ulits/static-data"
 
 @Component
 export default class AuthorPost extends Vue{
+  
+  $router;
+
   private style: string = ''
   private mounted(): void {
     let i :number = Number((Math.random()*gradientColor.length).toFixed())
     this.style = gradientColor[i]    
   }
+
+  private about(): void{
+    this.$router.push({path:"/about"})
+  }
+
 }
 </script>
 
@@ -52,7 +60,8 @@ export default class AuthorPost extends Vue{
   height: 100px;
   object-fit: cover;
   border-radius: 100%;
-  box-shadow:  0 2px 12px 0 rgba(51, 51, 51, .4)
+  box-shadow:  0 2px 12px 0 rgba(51, 51, 51, .4);
+  cursor: pointer;
 }
 
 @media screen and (max-width: 800px){

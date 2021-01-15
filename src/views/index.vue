@@ -3,7 +3,7 @@
     <!-- <AuthorPost /> -->
     <!-- <NaviTopBar /> -->
     <div class="blogDataListWarp">
-      <BlogDataList />
+      <BlogDataList :darkMode="this.$darkMode" :blogData="blogData"  />
       <PagesIndex :pagesNum="pagesNums" />
     </div>
 
@@ -15,6 +15,15 @@
 import { Component, Vue } from "vue-property-decorator";
 import BlogDataList from "../components/blogDataList.vue"
 import PagesIndex from "../components/pagesIndex.vue"
+import {getBlogData} from "../api/api"
+
+interface blogObject{
+  blog_title:string,
+  blog_describle:string,
+  blog_date:string,
+  blog_type:string,
+  id:Number
+}
 
 @Component({
   components: {
@@ -23,11 +32,16 @@ import PagesIndex from "../components/pagesIndex.vue"
   }
 })
 export default class index extends Vue{
+
   private name :string = "ubdedawweq";
+  private darkMode: boolean = false
   private pagesNums: number = 120
-  public test(): void{
-    console.log("hahahahahha")
-    
+  private blogData: Array<blogObject> = []
+
+  private mounted(): void{
+    getBlogData().then(res =>{    
+      if(res.status == 200){this.blogData = res.data}else{alert("Something Wrong")}
+    })
   }
 }
 </script>
