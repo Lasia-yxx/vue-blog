@@ -2,7 +2,7 @@
   <div id="ls-BDL-warp" :style="dark_mode_style">
     <div v-for="item in cleanData" :key="item.index" class="ls-BDL-container">
       <div class="ls-BDL-title">{{item.blog_title}}</div>
-      <div class="ls-BDL-describle" :style="dark_mode_style">{{item.blog_describle}}<a class="ls-BDL-arrow">>></a></div>
+      <div class="ls-BDL-describle" :style="dark_mode_style">{{item.blog_info}}<a class="ls-BDL-arrow">>></a></div>
       <div class="ls-BDL-date" :style="dark_mode_style">{{item.blog_date}}</div>
       <div class="ls-BDL-type" :style="dark_mode_style"><i class="el-icon-link"></i>{{item.blog_type}}</div>
       <div v-if="isHoster" :style="dark_mode_style" class="ls-del-btn">删除</div>
@@ -16,7 +16,7 @@ import tool from "../ulits/tools"
 
 interface blogObject{
   blog_title:string,
-  blog_describle:string,
+  blog_info:string,
   blog_date:string,
   blog_type:string,
   id:Number

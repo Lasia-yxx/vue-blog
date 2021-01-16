@@ -7,7 +7,7 @@
 
       <div :class="['ls-FB-func',this.$darkMode?'choose':'']" @click="darkMode">Dark Mode</div>
       <div :class="['ls-FB-func',$route.name=='search'?'choose':'']" @click="search">Search</div>
-      <div :class="['ls-FB-func',$loginStatus?'choose':'']" @click="login">Login</div>
+      <div :class="['ls-FB-func',$isHoster?'choose':'']" @click="login">Login</div>
       
     </div>
   </div>

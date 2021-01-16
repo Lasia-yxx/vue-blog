@@ -3,7 +3,7 @@
     <AuthorPost />
     <NaviTopBar />
     <FunctionBall @darkMode="darkMode" @login="login"/>
-
+    <HosterFuncBar v-if="this.$isHoster" :routerName="this.$route.name" />
     <router-view :darkMode="this.$darkMode" />
 
     <div class="bottomBlank"></div>
@@ -24,6 +24,7 @@
 import AuthorPost from "@/components/authorPost.vue"
 import NaviTopBar from "@/components/naviTopBar.vue"
 import FunctionBall from "@/components/functionBall.vue"
+import HosterFuncBar from "@/components/hosterFuncBar.vue"
 import {loginCheck} from "@/api/user"
 
 export default {
@@ -31,7 +32,8 @@ export default {
   components:{
     AuthorPost,
     NaviTopBar,
-    FunctionBall
+    FunctionBall,
+    HosterFuncBar
   },
   data(){
     return {
@@ -58,7 +60,7 @@ export default {
           if(res.data.code){
             this.$loginStatus=true
             this.$token = res.data.token
-            this.$cookies.set("token",res.data.token,"2d")
+            this.$cookies.set("token",res.data.token,"1d")
             this.$router.push({path:"/hoster"})
             this.isLogin = false
           }else{this.$loginStatus=false;alert("Something Wrong,检查密码是否正确")}

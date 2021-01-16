@@ -1,7 +1,6 @@
 <template>
   <div class="blogWarp">
-    <BlogDataList :darkMode="this.$darkMode" :blogData="blogData" :isHoster="isHoster" />
-    <HosterFuncBar @switchBlog = "switchBlog" />
+    <BlogDataList v-if="showStatus" :darkMode="this.$darkMode" :blogData="blogData" :isHoster="this.$isHoster" />    
   </div>
   
 </template>
@@ -9,6 +8,7 @@
 import {Vue,Component} from 'vue-property-decorator'
 import HosterFuncBar from "../components/hosterFuncBar.vue"
 import BlogDataList from "../components/blogDataList.vue"
+import NoteDataList from "../components/noteDataList.vue"
 import {tokenCheck} from "../api/user"
 import {getBlogData} from "../api/api"
 
@@ -23,32 +23,33 @@ interface blogObject{
 @Component({
   components:{
     HosterFuncBar,
-    BlogDataList
+    BlogDataList,
+    NoteDataList
   }
 })
 export default class hoster extends Vue{
 
-  $token;$loginStatus
+  $token;$loginStatus;$isHoster
 
-  private isHoster: boolean = false
+  private showStatus: boolean = true
   private blogData: Array<blogObject> = []
 
   private mounted(): void{
     this.tokenCheck()
-    getBlogData().then(res =>{    
+    getBlogData({pages:1}).then(res =>{    
       if(res.status == 200){this.blogData = res.data}else{alert("Something Wrong")}
     })
   }
 
   private switchBlog(value): void{
-    console.log(value);
+    if(value == "Blog"){this.showStatus = true}else{this.showStatus = false}
     
   }
 
   private tokenCheck(): void{
     if(this.$token || this.$loginStatus){
       tokenCheck({token:this.$token}).then(res => {
-        if(res.data.code){this.isHoster = true}else{Vue.prototype.$tokenReset()}
+        if(res.data.code){this.$isHoster = true}else{Vue.prototype.$tokenReset()}
       }).catch(err =>{console.log("登陆身份出现错误请重新登录");Vue.prototype.$tokenReset()})
     }
   }

@@ -12,10 +12,14 @@ Vue.prototype.$darkMode = false
 Vue.prototype.$md5 = md5
 Vue.prototype.$loginStatus = false
 Vue.prototype.$token = ""
+Vue.prototype.$isHoster = false
+
 
 Vue.prototype.$err = function(err: any) :void{alert("Something Wrong");console.log(err);}
 Vue.prototype.$tokenReset = function(res: any): void{
   Vue.prototype.$loginStatus = false
+  Vue.prototype.$isHoster = false
+  Vue.$cookies.remove("token")
   router.push({path:"/index"})
   alert("登录信息出错，请重新登录")
 }
@@ -46,7 +50,6 @@ Vue.use(VueCookies)
 if(Vue.$cookies.get("token")){
   Vue.prototype.$token = Vue.$cookies.get("token")
   Vue.prototype.$loginStatus = true
-  console.log(Vue.$cookies.get("token"))
 }
 
 new Vue({

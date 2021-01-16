@@ -6,52 +6,117 @@
     </div>
     <div ref="tips" class="ls-NDL-tipsContainer">
       <div class="ls-NDL-tips" :style="darkModeStyle" v-for="item in tipsData" :key="item.index">
-        <div class="ls-NDL-tipsDate">{{item.tips_date}}<i class="el-icon-close"></i></div>
+        <div class="ls-NDL-tipsDate">{{item.tips_date}}<i v-if="isHoster" class="el-icon-close"></i></div>
         <p class="ls-NDL-tipsInfo">{{item.tips_info}}</p>
         <div class="ls-NDL-label">Tips</div>
       </div>
+      <PagesIndex style="margin-top:40px" :pagesNum="pagesTipsNum" @pageChange="pageChange" />
     </div>
     <div ref="notes" class="ls-NDL-noteContainer">
       <div class="ls-NDL-note" :style="fontColor" v-for="item in noteData" :key="item.index">
         <div class="ls-NDL-noteTitle">{{item.note_title}}</div>
         <div class="ls-NDL-noteDate">
-          <i class="el-icon-edit"></i> 
-          <i class="el-icon-delete"></i>
-          Update {{item.note_date}}
+          <i v-if="isHoster" class="el-icon-edit"></i> 
+          <i v-if="isHoster" class="el-icon-delete"></i>
+          Last Update {{item.last_date}}
         </div>
+      </div>
+      <div v-if="pagesNoteNum !== 1" class="ls-NDL-notePages" >
+        <button @click="pagesReduce" :class="currentNotePage == 1?'disable':'nodisable'" :disabled="currentNotePage <= 1"><i class="el-icon-arrow-left"></i></button>
+        <input v-model="currentNotePage" :title="'共有' + pagesTipsNum + '页'" @blur="inputPages" @keyup.enter="inputPages" />
+        <button @click="pagesAdd" :class="currentNotePage == pagesNoteNum?'disable':'nodisable'" :disabled="currentNotePage >= pagesNoteNum"><i class="el-icon-arrow-right"></i></button>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
+import PagesIndex from "../components/Pages.vue"
 import {Vue,Component,Prop, Watch} from 'vue-property-decorator'
 import {colorArr} from "../ulits/static-data"
+import {getTips,getNote,getDataLength} from "../api/api"
 
-
-@Component
+@Component({
+  components:{
+    PagesIndex
+  }
+})
 export default class NoteDataList extends Vue{
 
-  $refs;
+  $refs;$err;$darkMode
 
   private darkModeStyle: string = null
   private fontColor: string = null
   private switchType: number = 1
 
-  private tipsData = [
-    {tips_date:"28  OCT  2020",tips_info:"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nihil laborum corrupti mollitia praesentium quibusdam magnam quia iure consectetur, ipsa, alias deserunt distinctio. Iste quisquam autem iure cupiditate fugit eius nobis."},
-    {tips_date:"28  FEB  2020",tips_info:"Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam odit ex harum ullam incidunt ab eligendi at impedit itaque corrupti ut velit, magnam libero ad voluptate debitis. Rerum soluta fuga nostrum hic impedit sunt, delectus eos laudantium numquam. Officiis voluptatum exercitationem expedita unde qui consequuntur id animi nesciunt similique laudantium recusandae dicta placeat voluptates, deleniti deserunt sed eos odio adipisci dignissimos aspernatur ipsum? Ad doloremque excepturi optio incidunt eveniet, quam facilis animi modi iste suscipit soluta? Quibusdam excepturi, numquam molestiae provident sequi facilis ipsa reprehenderit velit expedita incidunt aliquid ab ipsum! Accusantium eos sunt distinctio quod ea ad temporibus sed."},
-    {tips_date:"28  AUG  2020",tips_info:"Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque at blanditiis tempora facere modi cum, eveniet error doloremque obcaecati qui est dolorem minus vel nam, quos, tenetur earum ipsum nobis? Natus vel delectus laboriosam tenetur. Cum, blanditiis nihil, a est cumque consequuntur praesentium at repellendus doloremque possimus similique eveniet aliquam eaque voluptates, repudiandae quos voluptas consectetur ullam voluptatum maxime ipsa?"}
-  ]
+  private pagesTipsNum: number = 10
+  private pagesNoteNum: number = 1
+  private currentTipsPage: number = 1
+  private currentNotePage: number = 1
 
-  private noteData = [
-    {note_title:"JavaScript高级程序设计(第四版)读书笔记",note_date:"15 JAN 2021"},
-    {note_title:"JavaScript高级程序设计(第四版)读书笔记",note_date:"15 JAN 2021"},
-    {note_title:"娱乐至死读书笔记",note_date:"15 JAN 2021"}
-  ]
+  private tipsData = []
+
+  private noteData = []
 
   private mounted(): void{
-    this.darkModeStyle = "backgroundColor:" + this.changeColor()
+    if(!this.$darkMode){this.darkModeStyle = "backgroundColor:" + this.changeColor()}
+    getDataLength({database:"tips"}).then(res =>{
+      this.pagesTipsNum = Math.ceil(res.data[0]["count(*)"] / 8) * 10     
+    }).catch(err => {this.$err(err)})
+    getDataLength({database:"note"}).then(res =>{
+      this.pagesNoteNum = Math.ceil(res.data[0]["count(*)"] / 10)    
+    }).catch(err => {this.$err(err)})
+
+    this.getTipsData()
+    this.getNoteData()
   }
+
+  private getTipsData(): void{
+    getTips({pages:this.currentTipsPage}).then(res => {
+      this.tipsData = res.data
+    }).catch(err => {this.$err(err)})
+  }
+  private getNoteData(): void{
+    getNote({pages:this.currentNotePage}).then(res => {
+      this.noteData = res.data
+    }).catch(err => {this.$err(err)})
+  }
+
+  private inputPages(): void{
+    if(this.currentNotePage >= 1 && this.currentNotePage <= this.pagesNoteNum){
+      this.getNoteData()
+    }else{
+      this.currentNotePage = 1
+      alert("最多只有"+ this.pagesNoteNum + "页，只能输入中文")
+    }
+  }
+
+  private pageChange(val): void{
+    this.currentTipsPage = val
+    this.getTipsData()
+    console.log(this.currentTipsPage)
+  }
+
+  private pagesReduce(): void{
+    if(this.currentNotePage > 1){
+      this.currentNotePage = this.currentNotePage - 1
+      this.getNoteData()
+    }else{
+      this.currentNotePage = 1
+    }
+  }
+
+  private pagesAdd(): void{
+    if(this.currentNotePage < this.pagesNoteNum){
+      this.currentNotePage = this.currentNotePage + 1
+      this.getNoteData()
+    }else{
+      this.currentNotePage = this.pagesNoteNum
+    }
+    console.log(this.currentNotePage,this.pagesNoteNum)
+  }
+
+
+
 
   private changeColor(): string{    
     return colorArr[Math.ceil(Math.random()*colorArr.length -1)]
@@ -62,24 +127,23 @@ export default class NoteDataList extends Vue{
       this.$refs.tips.style.display = "block";
       this.$refs.notes.style.display = "block"
     }else{
-      this.$refs.tips.style.display = "block";
-      this.$refs.notes.style.display = "none"
+      this.doSwitch(this.switchType)
     }
   }
 
   private doSwitch(index: number): void{
     let tips  = this.$refs.tips
     let notes = this.$refs.notes
-    if(this.switchType !== 1 && index == 1){
-      console.log("111")
+    if(index == 1){
       this.switchType = index
       tips.style.display = "block";notes.style.display = "none"
-    }else if(this.switchType !== 2 && index == 2){
-      console.log("222")
+    }else if(index == 2){
       this.switchType = index
       tips.style.display = "none";notes.style.display = "block"
     }
   }
+
+  @Prop({type:Boolean,default:false}) isHoster!:boolean
 
   @Prop({type:Boolean,required:true}) darkMode!:boolean
   @Watch("darkMode",{deep:true,immediate:true})
@@ -90,11 +154,8 @@ export default class NoteDataList extends Vue{
     }else{
       this.darkModeStyle = "backgroundColor:" + this.changeColor()
       this.fontColor = null
-    }    
-    // console.log(this.darkModeStyle);
-    
+    }        
   }
-
 }
 </script>
 <style lang="scss" scoped>
@@ -135,6 +196,13 @@ export default class NoteDataList extends Vue{
       float: right;
       font-size: .8em;
     }
+    i:hover{
+      // color: #409EFF;
+      font-weight: bolder;
+      transform: rotate(180deg);
+      transition: transform .4s linear ;
+      // transition: opacity .8s ease-in-out;
+    }
   }
   .ls-NDL-tipsInfo{
     font-weight: lighter;
@@ -154,7 +222,7 @@ export default class NoteDataList extends Vue{
   height: auto;
 }
 .ls-NDL-note{
-  margin: 20px 0;
+  margin: 20px 0 40px 0;
   box-sizing: content-box;
 }
 
@@ -175,6 +243,42 @@ export default class NoteDataList extends Vue{
     float: left;
     margin: 0 20px 0 0;
   }
+}
+
+.ls-NDL-notePages{
+  text-align: center;
+  button{
+    width: 35px;
+    height: 35px;
+    display: inline-block;
+    margin: 0 15px;
+    border: none;
+    outline: none;
+    
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  }
+  input{
+    width: 35px;
+    height: 35px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  }
+}
+
+.disable{
+  cursor: not-allowed;
+  background-color: #b7b7b7;
+}
+.nodisable{
+  cursor: pointer;
+  background-color: #409EFF;
 }
 
 @media screen and (max-width: 800px) {
@@ -216,6 +320,13 @@ export default class NoteDataList extends Vue{
     }
     .ls-NDL-noteDate{
       font-size: 1.4em;
+    }
+  }
+  .ls-NDL-notePages{
+    button,input{
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
     }
   }
 }

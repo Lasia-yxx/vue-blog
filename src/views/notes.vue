@@ -2,7 +2,7 @@
 
   <div class="notes-warp">
     <div class="notes-container">
-      <NoteDataList :darkMode="this.$darkMode" />
+      <NoteDataList :darkMode="this.$darkMode" :isHoster="this.$isHoster" />
     </div>
   </div>
 

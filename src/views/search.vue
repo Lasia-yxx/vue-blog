@@ -1,19 +1,19 @@
 <template>
   <div id="search-warp">
     <div class="searchContaier" :style="dark_mode_style">
-      <input class="search-input" />
+      <input @keyup.enter="doSearch" v-model="searchKey" class="search-input" />
       <div class="searchIcon-warp">
         <i @click="doSearch" :class="icon_class"></i>
       </div>
     </div>
-    <div class="blogDataWarp"><BlogDataList :isHoster="isHoster" :darkMode="this.$darkMode" :blogData="blogData" /></div>
+    <div class="blogDataWarp"><BlogDataList :isHoster="this.$isHoster" :darkMode="this.$darkMode" :blogData="blogData" /></div>
 
   </div>
 </template>
 <script lang="ts">
 import { Component,Watch,Vue,Prop } from "vue-property-decorator";
 import BlogDataList from "../components/blogDataList.vue"
-// import {test} from "../api/api"
+import {searchBlog} from "../api/api"
 import {tokenCheck} from "../api/user"
 
 interface blogObject{
@@ -30,28 +30,31 @@ interface blogObject{
 })
 export default class search extends Vue{
 
-  $loginStatus;$token
+  $loginStatus;$token;$isHoster
 
   private dark_mode_style: object = null
   private icon_class: string = "el-icon-search"
-  private isHoster: boolean = false
+  private searchKey: string = ""
 
-  private blogData: Array<blogObject> = [
-    {blog_title:"JavaScript基础算法：反转字符串",blog_describle:"mac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧ac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧",blog_date:"28 OCT 2016",blog_type:"工具"},
-    {blog_title:"JavaScript基础算法：反转字符串",blog_describle:"mac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧",blog_date:"28 OCT 2016",blog_type:"工具"},
-    {blog_title:"JavaScript基础算法：反转字符串",blog_describle:"mac上无论是npm、git都会需要用到终端操作，虽然坑多，但是总要去尝试。空中做了吧",blog_date:"28 OCT 2016",blog_type:"工具"}
-  ]
+  private blogData: Array<blogObject> = []
 
   private mounted(): void{
     if(this.$loginStatus && this.$token){
       tokenCheck({token:this.$token}).then(res => {
-        if(res.data.code){this.isHoster = true}
+        if(res.data.code){this.$isHoster = true}
       })
     }
   }
 
-  private doSearch(): void{
+  private doSearch(): boolean{
+    let keyword = this.searchKey
+    if(!keyword){alert("输入值不能为空");return false}
     this.icon_class = "el-icon-loading"
+    searchBlog({keyword:keyword}).then(res => { 
+      if(res.data.length == 0){alert("搜索结果为空")}
+      if(res.status == 200){this.blogData = res.data}
+      this.icon_class = "el-icon-search"
+    }).catch(err => {alert("Something Wrong!");console.log(err);this.icon_class = "el-icon-search"})
   }
 
   @Prop({type:Boolean,required:true}) darkMode!: boolean
@@ -95,7 +98,6 @@ export default class search extends Vue{
     outline: none;
     padding-left: 20px;
     font-size: 1.7rem;
-    letter-spacing: 2px;
     background-color: inherit;
     color: inherit;
   }

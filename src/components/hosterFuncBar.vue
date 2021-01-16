@@ -5,9 +5,30 @@
       <i id="ls-HF-narrowScreen" class="el-icon-s-operation"></i>
     </div>
     <div class="ls-HF-funcWarp" :style="style">
-      <div :class="['ls-HF-func',this.$darkMode?'choose':'']" @click="darkMode">Dark Mode</div>
-      <div :class="['ls-HF-func',$route.name=='search'?'choose':'']" @click="search">Search</div>
-      <div :class="['ls-HF-func',$loginStatus?'choose':'']" @click="login">{{hosterStatus}}</div>
+      <div :class="['ls-HF-func',this.$darkMode?'choose':'']" @click="loginOut">Login Out</div>
+
+      <div v-if="routerName == 'notes'" 
+      :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
+      @click="writeTips"><i class="el-icon-edit"></i>Tips
+      </div>
+
+      <div v-if="routerName == 'hoster'" 
+      :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
+      @click="writeBlog"><i class="el-icon-edit"></i>Blog
+      </div>
+
+      <div v-if="routerName == 'photo'" 
+      :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
+      @click="writeBlog"><i class="el-icon-camera-solid"></i>Photo
+      </div>
+
+      <div v-if="routerName == 'about'" 
+      :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
+      @click="writeBlog"><i class="el-icon-edit"></i>About
+      </div>
+
+
+      <div :class="['ls-HF-func',$route.name=='hoster'?'choose':'']" @click="login">Hoster</div>
     </div>
   </div>
 </template>
@@ -22,30 +43,36 @@ interface styleObj{
 @Component
 export default class HosterFuncBar extends Vue{
 
-  $cookies
+  $cookies;$route;$router;$tokenReset
+
+  @Prop({type:String,required:true}) routerName!: string
 
   private display: boolean = false
   private style: styleObj = {maxHeight:'0px',opacity:0}
-  private hosterStatus: string  = "Blog"
 
   private showFunction(): void{
     if(this.display){this.style = {maxHeight:"0px",opacity:0}}else{this.style = {maxHeight:"200px",opacity:1}}
     this.display = !this.display
   }
 
-  private darkMode(): void{
-    this.$cookies.remove("token")
-    console.log(this.$cookies.get("token"));
+  private loginOut(): void{
+    this.$tokenReset()
+  }
+
+  private login(): void{
+    if(this.$route.name !== "hoster"){
+      this.$router.push({path:"hoster"})
+    }
+    this.showFunction()
+  }
+
+  private writeTips(): void{
+
+  }
+  private writeBlog(): void{
+
+  }
     
-  }
-  private search(): void{}
-  @Emit("switchBlog")
-  private login(): string{
-    if(this.hosterStatus === "Blog"){
-      this.hosterStatus = "Notes"
-    }else{this.hosterStatus = "Blog"}
-    return this.hosterStatus
-  }
 }
 </script>
 <style lang='scss' scoped>
@@ -144,6 +171,7 @@ export default class HosterFuncBar extends Vue{
   }
   .ls-HF-func:hover{
     box-shadow: initial;
+    color: #08bbff;
   }
   #ls-HF-widthScreen{display: none;}
   #ls-HF-narrowScreen{display: initial;}

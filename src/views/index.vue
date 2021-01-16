@@ -4,7 +4,7 @@
     <!-- <NaviTopBar /> -->
     <div class="blogDataListWarp">
       <BlogDataList :darkMode="this.$darkMode" :blogData="blogData"  />
-      <PagesIndex :pagesNum="pagesNums" />
+      <PagesIndex :pagesNum="pagesNum" @pageChange="pageChange" />
     </div>
 
   </div>
@@ -14,8 +14,8 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import BlogDataList from "../components/blogDataList.vue"
-import PagesIndex from "../components/pagesIndex.vue"
-import {getBlogData} from "../api/api"
+import PagesIndex from "../components/Pages.vue"
+import {getBlogData,getDataLength} from "../api/api"
 
 interface blogObject{
   blog_title:string,
@@ -33,15 +33,31 @@ interface blogObject{
 })
 export default class index extends Vue{
 
-  private name :string = "ubdedawweq";
+  $err
+
   private darkMode: boolean = false
-  private pagesNums: number = 120
+  private pagesNum: number = 1000
   private blogData: Array<blogObject> = []
+  private currentPage: number = 1
 
   private mounted(): void{
-    getBlogData().then(res =>{    
+
+    getDataLength({database:"blog"}).then(res =>{
+      this.pagesNum = Math.ceil(res.data[0]["count(*)"]/10) * 10      
+    }).catch(err => {this.$err(err)})
+    
+    this.getData()
+  }
+
+  private getData(): void{
+    getBlogData({pages:this.currentPage}).then(res =>{    
       if(res.status == 200){this.blogData = res.data}else{alert("Something Wrong")}
-    })
+    }).catch(err => {this.$err(err)})
+  }
+
+  private pageChange(val): void{
+    this.currentPage = val
+    this.getData()
   }
 }
 </script>
