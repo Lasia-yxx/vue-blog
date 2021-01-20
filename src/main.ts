@@ -5,6 +5,8 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import md5 from "js-md5"
 import VueCookies from "vue-cookies"
+import marvonEditor from "mavon-editor"
+import 'mavon-editor/dist/css/index.css'
 
 Vue.config.productionTip = false;
 
@@ -13,6 +15,8 @@ Vue.prototype.$md5 = md5
 Vue.prototype.$loginStatus = false
 Vue.prototype.$token = ""
 Vue.prototype.$isHoster = false
+
+Vue.prototype.$writeWhat = ""
 
 
 Vue.prototype.$err = function(err: any) :void{alert("Something Wrong");console.log(err);}
@@ -46,6 +50,7 @@ Vue.directive("disappear",{
 
 Vue.use(ElementUI)
 Vue.use(VueCookies)
+Vue.use(marvonEditor)
 
 if(Vue.$cookies.get("token")){
   Vue.prototype.$token = Vue.$cookies.get("token")

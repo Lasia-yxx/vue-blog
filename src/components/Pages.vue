@@ -28,9 +28,7 @@ export default class PageIndexs extends Vue{
   @Prop({type:Number,required:true}) pagesNum!: number
 
   @Watch("currenPage",{immediate:true})
-  popPageIndex(){
-    console.log("change");
-    
+  popPageIndex(){    
     this.pageChange()
   }
 

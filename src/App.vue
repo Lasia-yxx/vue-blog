@@ -1,12 +1,15 @@
 <template>
   <div id="app">
-    <AuthorPost />
-    <NaviTopBar />
-    <FunctionBall @darkMode="darkMode" @login="login"/>
-    <HosterFuncBar v-if="this.$isHoster" :routerName="this.$route.name" />
+    <AuthorPost v-if="this.$route.name !== 'editor'" :isHoster="this.$isHoster"/>
+    <NaviTopBar v-if="this.$route.name !== 'editor'" />
+    <FunctionBall v-if="this.$route.name !== 'editor'" @darkMode="darkMode" @login="login"/>
+    <HosterFuncBar @write="wirte" v-if="this.$isHoster && this.$route.name !== 'editor'" :routerName="this.$route.name" />
     <router-view :darkMode="this.$darkMode" />
+    <FooterBar v-if="this.$route.name !== 'editor'" class="footerBar" :darkMode="this.$darkMode" />
 
-    <div class="bottomBlank"></div>
+    <!-- <UploadPhotography v-if="uploadIsClose && this.$route.name == 'photo'" @isClose="doClose" /> -->
+
+    <div v-if="this.$route.name !== 'editor'" class="bottomBlank"></div>
     <div v-if="isLogin" @click="cancleLogin" class="login-warp">
       <div class="login-container" @click.stop>
         <div class="label">登录</div>
@@ -25,6 +28,8 @@ import AuthorPost from "@/components/authorPost.vue"
 import NaviTopBar from "@/components/naviTopBar.vue"
 import FunctionBall from "@/components/functionBall.vue"
 import HosterFuncBar from "@/components/hosterFuncBar.vue"
+import FooterBar from "@/components/FooterBar.vue"
+import UploadPhotography from "@/components/UploadPhotography.vue"
 import {loginCheck} from "@/api/user"
 
 export default {
@@ -33,13 +38,16 @@ export default {
     AuthorPost,
     NaviTopBar,
     FunctionBall,
-    HosterFuncBar
+    HosterFuncBar,
+    FooterBar,
+    UploadPhotography
   },
   data(){
     return {
       isLogin:false,
       pwd:"",
-      searchIcon:"el-icon-finished"
+      searchIcon:"el-icon-finished",
+      // uploadIsClose:false
     }
   },
   methods:{
@@ -70,7 +78,29 @@ export default {
         this.isLogin = false
         if(this.$route.name !== 'hoster'){this.$router.push({path:"/hoster"})}
       }
-    }
+    },
+    // doClose(value){
+    //   this.uploadIsClose = value
+    // },
+    wirte(type){
+      console.log(type)
+      switch(type){
+        case "photo":
+          this.$writeWhat = "photo"
+          break
+        case "tips":
+          this.$writeWhat = "tips"
+          break
+        case "blog":
+          this.$router.push({name:"editor",query:{type:"blog",isEditor:0}})
+          break
+        case "about":
+          this.$router.push({name:"editor",query:{type:"lasia",isEditor:1,id:1}})
+          break
+        default:
+          alert("Something Wrong")
+      }
+    },
   }
 }
 </script>
@@ -84,12 +114,10 @@ html{
   background-color: #f5f5f5;
   -webkit-tap-highlight-color:rgba(0,0,0,0);
   font-family: "Arial","Microsoft YaHei","黑体","宋体",sans-serif;
+  word-break: break-all;
 }
 
-.bottomBlank{
-  width: 100%;
-  height: 100px;
-}
+
 
 .login-warp{
   width: 100%;
@@ -144,6 +172,9 @@ html{
 .loginBtn{
   display: none;
 }
+.footerBar{
+  margin-top:60px
+}
 
 @media screen and (max-width: 800px) {
   html{
@@ -168,6 +199,13 @@ html{
     border-radius: 20px;
     outline: none;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+  }
+  .bottomBlank{
+    width: 100%;
+    height: 80px;
+  }
+  .footerBar{
+    margin-top:20px
   }
 }
 </style>

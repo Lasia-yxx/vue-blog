@@ -6,7 +6,7 @@
     </div>
     <div ref="tips" class="ls-NDL-tipsContainer">
       <div class="ls-NDL-tips" :style="darkModeStyle" v-for="item in tipsData" :key="item.index">
-        <div class="ls-NDL-tipsDate">{{item.tips_date}}<i v-if="isHoster" class="el-icon-close"></i></div>
+        <div class="ls-NDL-tipsDate">{{item.tips_date}}<i v-if="isHoster" @click="delTips" :data-id="item.id" class="el-icon-close"></i></div>
         <p class="ls-NDL-tipsInfo">{{item.tips_info}}</p>
         <div class="ls-NDL-label">Tips</div>
       </div>
@@ -14,10 +14,10 @@
     </div>
     <div ref="notes" class="ls-NDL-noteContainer">
       <div class="ls-NDL-note" :style="fontColor" v-for="item in noteData" :key="item.index">
-        <div class="ls-NDL-noteTitle">{{item.note_title}}</div>
+        <div @click="getNoteDetail" :data-id="item.id" class="ls-NDL-noteTitle">{{item.note_title}}</div>
         <div class="ls-NDL-noteDate">
-          <i v-if="isHoster" class="el-icon-edit"></i> 
-          <i v-if="isHoster" class="el-icon-delete"></i>
+          <i v-if="isHoster" @click="editNote" :data-id="item.id" class="el-icon-edit"></i> 
+          <i v-if="isHoster" @click="delNote" :data-id="item.id" class="el-icon-delete"></i>
           Last Update {{item.last_date}}
         </div>
       </div>
@@ -34,6 +34,7 @@ import PagesIndex from "../components/Pages.vue"
 import {Vue,Component,Prop, Watch} from 'vue-property-decorator'
 import {colorArr} from "../ulits/static-data"
 import {getTips,getNote,getDataLength} from "../api/api"
+import {delData} from "../api/user"
 
 @Component({
   components:{
@@ -42,7 +43,7 @@ import {getTips,getNote,getDataLength} from "../api/api"
 })
 export default class NoteDataList extends Vue{
 
-  $refs;$err;$darkMode
+  $refs;$err;$darkMode;$token;$tokenReset;$router
 
   private darkModeStyle: string = null
   private fontColor: string = null
@@ -93,7 +94,6 @@ export default class NoteDataList extends Vue{
   private pageChange(val): void{
     this.currentTipsPage = val
     this.getTipsData()
-    console.log(this.currentTipsPage)
   }
 
   private pagesReduce(): void{
@@ -112,10 +112,32 @@ export default class NoteDataList extends Vue{
     }else{
       this.currentNotePage = this.pagesNoteNum
     }
-    console.log(this.currentNotePage,this.pagesNoteNum)
   }
 
+  private delTips(e): void{
+    let data = {id:e.srcElement.dataset.id,token:this.$token,database:"tips"}
+    delData(data).then(res => {
+      if(res.data){alert("删除成功");this.getTipsData()}
+      else{this.$tokenReset()}
+    }).catch(err => {this.$err(err)})
+  }
 
+  private getNoteDetail(e): void{
+    let data = {id:e.srcElement.dataset.id,database:"note"}
+    this.$router.push({path:"/read",query:data})
+  }
+
+  private delNote(e): void{
+    let data = {id:e.srcElement.dataset.id,token:this.$token,database:"note"}
+    delData(data).then(res => {
+      if(res.data){alert("删除成功");this.getNoteData()}
+      else{this.$tokenReset()}
+    }).catch(err => {this.$err(err)})
+  }
+
+  private editNote(e): void{
+    this.$router.push({name:"editor",query:{type:"note",isEditor:1,id:e.srcElement.dataset.id}})
+  }
 
 
   private changeColor(): string{    
@@ -144,6 +166,12 @@ export default class NoteDataList extends Vue{
   }
 
   @Prop({type:Boolean,default:false}) isHoster!:boolean
+
+  @Prop({type:Boolean,required:true}) isUpload!:boolean
+  @Watch("isUpload",{immediate:false})
+  onRefrashData(){
+    this.getTipsData()
+  }
 
   @Prop({type:Boolean,required:true}) darkMode!:boolean
   @Watch("darkMode",{deep:true,immediate:true})
@@ -242,6 +270,10 @@ export default class NoteDataList extends Vue{
   i{
     float: left;
     margin: 0 20px 0 0;
+    cursor: pointer;
+  }
+  i:hover{
+    color:#409EFF;
   }
 }
 

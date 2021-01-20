@@ -50,7 +50,7 @@ export default class index extends Vue{
   }
 
   private getData(): void{
-    getBlogData({pages:this.currentPage}).then(res =>{    
+    getBlogData({pages:this.currentPage}).then(res =>{   
       if(res.status == 200){this.blogData = res.data}else{alert("Something Wrong")}
     }).catch(err => {this.$err(err)})
   }

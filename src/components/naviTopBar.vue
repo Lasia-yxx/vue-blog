@@ -52,6 +52,7 @@ export default class NaviTopBar extends Vue{
     margin-top: 30px;
     user-select: none;
     cursor: pointer;
+    z-index: 999999999999999;
   }
   .ls-navi-title-warp{
     display: inline;

@@ -43,6 +43,18 @@ const routes: Array<RouteConfig> = [
     name:"hoster",
     component: () =>
       import("@/views/hoster.vue")
+  },
+  {
+    path:"/editor",
+    name:"editor",
+    component: () => 
+      import("@/views/editor.vue")
+  },
+  {
+    path:"/read",
+    name:"read",
+    component: () =>
+      import("@/views/read.vue")
   }
   // {
   //   path: "/about",

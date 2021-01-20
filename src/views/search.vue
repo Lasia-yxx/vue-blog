@@ -30,7 +30,7 @@ interface blogObject{
 })
 export default class search extends Vue{
 
-  $loginStatus;$token;$isHoster
+  $loginStatus;$token;$isHoster;$err
 
   private dark_mode_style: object = null
   private icon_class: string = "el-icon-search"
@@ -52,9 +52,9 @@ export default class search extends Vue{
     this.icon_class = "el-icon-loading"
     searchBlog({keyword:keyword}).then(res => { 
       if(res.data.length == 0){alert("搜索结果为空")}
-      if(res.status == 200){this.blogData = res.data}
+      else{this.blogData = res.data}
       this.icon_class = "el-icon-search"
-    }).catch(err => {alert("Something Wrong!");console.log(err);this.icon_class = "el-icon-search"})
+    }).catch(err => {this.$err(err);this.icon_class = "el-icon-search"})
   }
 
   @Prop({type:Boolean,required:true}) darkMode!: boolean

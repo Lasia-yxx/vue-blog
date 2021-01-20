@@ -5,35 +5,42 @@
       <i id="ls-HF-narrowScreen" class="el-icon-s-operation"></i>
     </div>
     <div class="ls-HF-funcWarp" :style="style">
-      <div :class="['ls-HF-func',this.$darkMode?'choose':'']" @click="loginOut">Login Out</div>
+      <div :class="['ls-HF-func']" @click="loginOut">Login Out</div>
 
       <div v-if="routerName == 'notes'" 
       :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
-      @click="writeTips"><i class="el-icon-edit"></i>Tips
+      @click="write('tips')"><i class="el-icon-edit"></i>Tips
       </div>
 
       <div v-if="routerName == 'hoster'" 
       :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
-      @click="writeBlog"><i class="el-icon-edit"></i>Blog
+      @click="write('blog')"><i class="el-icon-edit"></i>Blog
+      </div>
+
+      <div v-if="routerName == 'index'" 
+      :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
+      @click="write('blog')"><i class="el-icon-edit"></i>Blog
       </div>
 
       <div v-if="routerName == 'photo'" 
       :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
-      @click="writeBlog"><i class="el-icon-camera-solid"></i>Photo
+      @click="write('photo')"><i class="el-icon-camera-solid"></i>Photo
       </div>
 
       <div v-if="routerName == 'about'" 
       :class="['ls-HF-func',$route.name=='search'?'choose':'']" 
-      @click="writeBlog"><i class="el-icon-edit"></i>About
+      @click="write('about')"><i class="el-icon-edit"></i>About
       </div>
 
 
       <div :class="['ls-HF-func',$route.name=='hoster'?'choose':'']" @click="login">Hoster</div>
+      <!-- <input @change="choosePic" ref="choosePic" type="file" style="display:none" accept="image/*" > -->
     </div>
   </div>
 </template>
 <script lang="ts">
 import {Vue,Component,Prop,Watch,Emit} from 'vue-property-decorator'
+
 
 interface styleObj{
   maxHeight:String,
@@ -43,7 +50,7 @@ interface styleObj{
 @Component
 export default class HosterFuncBar extends Vue{
 
-  $cookies;$route;$router;$tokenReset
+  $cookies;$route;$router;$tokenReset;$refs
 
   @Prop({type:String,required:true}) routerName!: string
 
@@ -66,12 +73,22 @@ export default class HosterFuncBar extends Vue{
     this.showFunction()
   }
 
-  private writeTips(): void{
-
+  @Emit("write")
+  private write(type): void{
+    return type
   }
-  private writeBlog(): void{
 
-  }
+  // private uploadPhoto(): void{
+  //   console.log("img");
+  //   this.$refs.choosePic.value = ""
+  //   this.$refs.choosePic.click()
+  // }
+
+  // private choosePic(): void{
+  //   let files = this.$refs.choosePic.files[0]
+  //   console.log(files.size);
+    
+  // }
     
 }
 </script>
@@ -82,7 +99,7 @@ export default class HosterFuncBar extends Vue{
   right: 30px;
   display: flex;
   flex-direction: column-reverse;
-  // opacity: ;
+  z-index: 999999999999999;
   align-items: center;
 }
 .ls-HF-ball{

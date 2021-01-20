@@ -1,6 +1,7 @@
 <template>
   <div class="blogWarp">
-    <BlogDataList v-if="showStatus" :darkMode="this.$darkMode" :blogData="blogData" :isHoster="this.$isHoster" />    
+    <BlogDataList v-if="showStatus" :darkMode="this.$darkMode" :blogData="blogData" @delBlog="delBlog" :isHoster="this.$isHoster" />
+    <PagesIndex :pagesNum="pagesNum" @pageChange="pageChange" />    
   </div>
   
 </template>
@@ -9,8 +10,9 @@ import {Vue,Component} from 'vue-property-decorator'
 import HosterFuncBar from "../components/hosterFuncBar.vue"
 import BlogDataList from "../components/blogDataList.vue"
 import NoteDataList from "../components/noteDataList.vue"
-import {tokenCheck} from "../api/user"
-import {getBlogData} from "../api/api"
+import PagesIndex from "../components/Pages.vue"
+import {tokenCheck,delData} from "../api/user"
+import {getBlogData,getDataLength} from "../api/api"
 
 interface blogObject{
   blog_title:string,
@@ -24,25 +26,49 @@ interface blogObject{
   components:{
     HosterFuncBar,
     BlogDataList,
-    NoteDataList
+    NoteDataList,
+    PagesIndex
   }
 })
 export default class hoster extends Vue{
 
-  $token;$loginStatus;$isHoster
+  $token;$loginStatus;$isHoster;$err
 
   private showStatus: boolean = true
   private blogData: Array<blogObject> = []
+  private pagesNum: number = 1000
+  private currentPage: number = 1
 
   private mounted(): void{
     this.tokenCheck()
-    getBlogData({pages:1}).then(res =>{    
-      if(res.status == 200){this.blogData = res.data}else{alert("Something Wrong")}
-    })
+
+    getDataLength({database:"blog"}).then(res =>{
+      this.pagesNum = Math.ceil(res.data[0]["count(*)"]/10) * 10      
+    }).catch(err => {this.$err(err)})
+    
+    this.getData()
   }
 
-  private switchBlog(value): void{
-    if(value == "Blog"){this.showStatus = true}else{this.showStatus = false}
+  private getData(): void{
+    getBlogData({pages:this.currentPage}).then(res =>{    
+      if(res.status == 200){this.blogData = res.data}else{alert("Something Wrong")}
+    }).catch(err => {this.$err(err)})
+  }
+
+  private pageChange(val): void{
+    this.currentPage = val
+    this.getData()
+  }
+
+  // private switchBlog(value): void{
+  //   if(value == "Blog"){this.showStatus = true}else{this.showStatus = false}
+  // }
+
+  private delBlog(val): void{
+    let data = {id:Number(val),token:this.$token,database:"blog"}
+    delData(data).then(res => {
+      if(res.data){alert("删除成功");this.getData()}else{Vue.prototype.$tokenReset()}
+    }).catch(err => {this.$err(err)})
     
   }
 

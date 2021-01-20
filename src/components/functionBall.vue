@@ -61,6 +61,7 @@ export default class FunctionBall extends Vue{
     left: 30px;
     display: flex;
     flex-direction: column-reverse;
+    z-index: 999999999999999;
   }
   .ls-FB-ball{
     width: 60px;
