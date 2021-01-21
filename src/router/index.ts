@@ -14,6 +14,48 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName:"index" */"@/views/index.vue")
   },
+  {
+    path:"/notes",
+    name:"notes",
+    component: () => 
+      import("@/views/notes.vue")
+  },
+  {
+    path:"/photo",
+    name:"photo",
+    component: () => 
+      import("@/views/photo.vue")
+  },
+  {
+    path:"/about",
+    name:"about",
+    component: () => 
+      import("@/views/about.vue")
+  },
+  {
+    path:"/search",
+    name:"search",
+    component: () =>
+      import("@/views/search.vue")
+  },
+  {
+    path:"/hoster",
+    name:"hoster",
+    component: () =>
+      import("@/views/hoster.vue")
+  },
+  {
+    path:"/editor",
+    name:"editor",
+    component: () => 
+      import("@/views/editor.vue")
+  },
+  {
+    path:"/read",
+    name:"read",
+    component: () =>
+      import("@/views/read.vue")
+  }
   // {
   //   path: "/about",
   //   name: "About",
@@ -25,10 +67,24 @@ const routes: Array<RouteConfig> = [
   // }
 ];
 
+
 const router = new VueRouter({
   mode: "hash",
   base: process.env.BASE_URL,
   routes
 });
+
+router.beforeEach((to: any,from: any,next: any): void => {
+  if(to.name === "hoster"){
+    if(!Vue.prototype.$token || !Vue.prototype.$loginStatus){
+      Vue.prototype.$token = ""
+      Vue.prototype.$loginStatus = false
+      Vue.$cookies.remove("token")
+      alert("无效的登陆状态")
+      next({name:"index"})
+    }else{next()}
+  }else{next()}
+})
+
 
 export default router;

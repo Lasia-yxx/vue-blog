@@ -1,24 +1,15 @@
 # vue-blog
 
-## Project setup
-```
-npm install
-```
+### 2021/01/07 by Lasia
+- 完成首页基本样式
+- 完成悬浮功能球的回到顶部功能
+- 正在构建搜索功能视图
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### 2021/01/17 by Lasia
+- 完成大部分功能
+- 尝试构建图片页面框架
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 2021/01/21 by Lasia
+- 完成所有博文类功能
+- 暂时未解决图片类信息
