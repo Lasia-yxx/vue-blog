@@ -17,7 +17,7 @@
       <div class="ls-UPG-Btncontainer">
         <div class="ls-laberl_blank"></div>
         <el-button :disabled="Boolean(filename)" size="small" @click="uploadPic" type="primary" class="ls-UPG-insert">上传图片</el-button>
-        <el-button :disabled="!Boolean(filename)" size="small" @click="deletePic" type="danger" class="ls-UPG-delete">删除图片</el-button>
+        <el-button :disabled="!Boolean(filename)" size="small" @click="deletePic()" type="danger" class="ls-UPG-delete">删除图片</el-button>
         <p>{{filename}}</p>
       </div>
       <div class="ls-UPG-submitContainer">
@@ -38,6 +38,8 @@ export default class UploadPhotography extends Vue{
 
   $refs;$err;$tokenReset;$token
 
+  private isDel: boolean = true
+
   private shotTime: string = null
   private shotPosi: string = null
   private shotTitle: string = null
@@ -50,8 +52,8 @@ export default class UploadPhotography extends Vue{
   }
 
   @Emit("isClose")
-  private doClose(): boolean{
-    if(this.filename){this.deletePic()}
+  private doClose(): boolean{    
+    if(this.filename && this.isDel){this.deletePic()}
     return this.isClose
   }
 
@@ -94,7 +96,12 @@ export default class UploadPhotography extends Vue{
     }).catch(err => {this.$err(err)})
   } 
 
-  private submit(): void{    
+  @Emit("uploadSuccess")
+  uploadSucc(){
+    return true
+  }
+
+  private submit(): void{ 
     if(!this.shotTime || !this.shotPosi || !this.filename){
       alert("提交前需要填写时间，地点，和上传图片")
     }else{
@@ -107,7 +114,7 @@ export default class UploadPhotography extends Vue{
         token:this.$token
       }
       uploadPhotographyPost(data).then(res => {
-        if(res.data){alert("上传成功");this.doClose()}else{this.$tokenReset()}
+        if(res.data){alert("上传成功");this.isDel = false;this.uploadSucc();this.doClose()}else{this.$tokenReset()}
       }).catch(err => {this.$err(err)})
     }
   }

@@ -57,3 +57,10 @@ export function getAbout(){
   })
 }
 
+export function getPhotography(data){
+  return service.request({
+    method  : "POST",
+    url     : "api/getPhotography",
+    data
+  })
+}

@@ -68,7 +68,7 @@ export default {
           if(res.data.code){
             this.$loginStatus=true
             this.$token = res.data.token
-            this.$cookies.set("token",res.data.token,"1d")
+            this.$cookies.set("token",res.data.token,"7d")
             this.$router.push({path:"/hoster"})
             this.isLogin = false
           }else{this.$loginStatus=false;alert("Something Wrong,检查密码是否正确")}
@@ -128,6 +128,7 @@ html{
   background-color: rgba(0,0,0,.5);
   position: fixed;
   top: 0;
+  z-index: 9999999999999;
 }
 .login-container{
   width: 30%;
